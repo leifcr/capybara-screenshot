@@ -144,8 +144,8 @@ describe Capybara::Screenshot::Saver do
     let(:saver) { Capybara::Screenshot::Saver.new(capybara_mock, page_mock) }
 
     before do
-      allow(saver).to receive(:html_path) { 'page.html' }
-      allow(saver).to receive(:screenshot_path) { 'screenshot.png' }
+      allow(saver).to receive(:html_path_alt_root) { 'page.html' }
+      allow(saver).to receive(:screenshot_path_alt_root) { 'screenshot.png' }
     end
 
     it 'outputs the path for the HTML screenshot' do
@@ -157,6 +157,28 @@ describe Capybara::Screenshot::Saver do
     it 'outputs the path for the Image screenshot' do
       allow(saver).to receive(:screenshot_saved?).and_return(true)
       expect(saver).to receive(:output).with("Image screenshot: screenshot.png")
+      saver.output_screenshot_path
+    end
+  end
+
+  describe '#output_screenshot_path with alternative path' do
+    let(:saver) { Capybara::Screenshot::Saver.new(capybara_mock, page_mock) }
+
+    before do
+      Capybara::Screenshot.alternative_root = '/tmp/joik/'
+      Capybara::Screenshot.append_timestamp = false
+      Capybara::Screenshot.append_random = false
+    end
+
+    it 'outputs the path for the HTML screenshot' do
+      allow(saver).to receive(:html_saved?).and_return(true)
+      expect(saver).to receive(:output).with("HTML screenshot: /tmp/joik/screenshot.html")
+      saver.output_screenshot_path
+    end
+
+    it 'outputs the path for the Image screenshot' do
+      allow(saver).to receive(:screenshot_saved?).and_return(true)
+      expect(saver).to receive(:output).with("Image screenshot: /tmp/joik/screenshot.png")
       saver.output_screenshot_path
     end
   end
