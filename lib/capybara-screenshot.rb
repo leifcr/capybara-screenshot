@@ -58,7 +58,7 @@ module Capybara
     end
 
     def self.capybara_alt_root
-      @capybara_alt_root ||= if !alternative_root.blank?
+      @capybara_alt_root ||= if alternative_root.length >0
         alternative_root
       elsif defined?(::Rails) && ::Rails.root.present?
         ::Rails.root.join capybara_tmp_path
