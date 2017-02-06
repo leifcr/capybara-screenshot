@@ -3,7 +3,7 @@ $:.push File.expand_path("../lib", __FILE__)
 require "capybara-screenshot/version"
 
 Gem::Specification.new do |s|
-  s.name        = "capybara-screenshot"
+  s.name        = "leifcr-capybara-screenshot"
   s.version     = Capybara::Screenshot::VERSION
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Matthew O'Riordan"]
