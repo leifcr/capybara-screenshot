@@ -190,6 +190,11 @@ Capybara.save_path = "/file/path"
 ```
 
 
+Alternative root path
+---------------------
+This is used change the root path in the output logs. Useful when running in a docker env, to show e.g. the root path on the host instead.
+
+
 Uploading screenshots to S3
 --------------------------
 You can configure capybara-screenshot to automatically save your screenshots to an AWS S3 bucket.
