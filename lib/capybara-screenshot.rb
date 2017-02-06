@@ -10,6 +10,7 @@ module Capybara
       attr_writer   :final_session_name
       attr_accessor :prune_strategy
       attr_accessor :s3_configuration
+      attr_accessor :alternative_root
     end
 
     self.autosave_on_failure = true
@@ -20,6 +21,7 @@ module Capybara
     self.webkit_options = {}
     self.prune_strategy = :keep_all
     self.s3_configuration = {}
+    self.alternative_root = ''
 
     def self.append_screenshot_path=(value)
       $stderr.puts "WARNING: Capybara::Screenshot.append_screenshot_path is deprecated. " +
@@ -53,6 +55,20 @@ module Capybara
       filename_prefix_formatters.fetch(test_type) { |key|
         filename_prefix_formatters[:default]
       }.call(test)
+    end
+
+    def self.capybara_alt_root
+      @capybara_root ||= if !alternative_root.blank?
+        alternative_root
+      elsif defined?(::Rails) && ::Rails.root.present?
+        ::Rails.root.join capybara_tmp_path
+      elsif defined?(Padrino)
+        File.expand_path(capybara_tmp_path, Padrino.root)
+      elsif defined?(Sinatra)
+        File.join(Sinatra::Application.root, capybara_tmp_path)
+      else
+        capybara_tmp_path
+      end.to_s
     end
 
     def self.capybara_root

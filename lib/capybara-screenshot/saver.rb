@@ -66,6 +66,14 @@ module Capybara
         File.join(Capybara::Screenshot.capybara_root, "#{file_base_name}.png")
       end
 
+      def html_path_alt_root
+        File.join(Capybara::Screenshot.capybara_alt_root, "#{file_base_name}.html")
+      end
+
+      def screenshot_path_alt_root
+        File.join(Capybara::Screenshot.capybara_alt_root, "#{file_base_name}.png")
+      end
+
       def html_saved?
         @html_saved
       end
@@ -86,8 +94,8 @@ module Capybara
       end
 
       def output_screenshot_path
-        output "HTML screenshot: #{html_path}" if html_saved?
-        output "Image screenshot: #{screenshot_path}" if screenshot_saved?
+        output "HTML screenshot: #{html_path_alt_root}" if html_saved?
+        output "Image screenshot: #{screenshot_path_alt_root}" if screenshot_saved?
       end
 
       # Print image to screen, if imgcat is available
