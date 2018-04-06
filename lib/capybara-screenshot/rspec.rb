@@ -43,7 +43,8 @@ module Capybara
         "RSpec::Core::Formatters::JsonFormatter"          => Capybara::Screenshot::RSpec::JsonReporter,
         "RSpec::Core::Formatters::TextMateFormatter"      => Capybara::Screenshot::RSpec::TextMateLinkReporter, # RSpec 2
         "RSpec::Mate::Formatters::TextMateFormatter"      => Capybara::Screenshot::RSpec::TextMateLinkReporter,  # RSpec 3
-        "Fuubar"                                          => Capybara::Screenshot::RSpec::TextReporter
+        "Fuubar"                                          => Capybara::Screenshot::RSpec::TextReporter,
+        "Spec::Runner::Formatter::TeamcityFormatter"      => Capybara::Screenshot::RSpec::TextReporter
       }
 
       class << self
@@ -52,7 +53,7 @@ module Capybara
         def after_failed_example(example)
           if example.example_group.include?(Capybara::DSL) # Capybara DSL method has been included for a feature we can snapshot
             Capybara.using_session(Capybara::Screenshot.final_session_name) do
-              if Capybara.page.current_url != '' && Capybara::Screenshot.autosave_on_failure && example.exception
+              if Capybara::Screenshot.autosave_on_failure && failed?(example) && Capybara.page.current_url != ''
                 filename_prefix = Capybara::Screenshot.filename_prefix_for(:rspec, example)
 
                 saver = Capybara::Screenshot.new_saver(Capybara, Capybara.page, true, filename_prefix)
@@ -64,6 +65,18 @@ module Capybara
               end
             end
           end
+        end
+
+        private
+
+        def failed?(example)
+          return true if example.exception
+          return false unless defined?(::RSpec::Expectations::FailureAggregator)
+
+          failure_notifier = ::RSpec::Support.failure_notifier
+          return false unless failure_notifier.is_a?(::RSpec::Expectations::FailureAggregator)
+
+          failure_notifier.failures.any? || failure_notifier.other_errors.any?
         end
       end
 
@@ -88,6 +101,7 @@ RSpec.configure do |config|
     if Capybara::Screenshot::RSpec.add_link_to_screenshot_for_failed_examples
       RSpec.configuration.formatters.each do |formatter|
         next unless (reporter_module = Capybara::Screenshot::RSpec::REPORTERS[formatter.class.to_s])
+        next if formatter.singleton_class.included_modules.include?(reporter_module)
         formatter.singleton_class.send :include, reporter_module
       end
     end

@@ -26,11 +26,23 @@ module Capybara
       end
 
       def save
-        # if current_path empty then nothing to screen shot as browser has not loaded any URL
-        return if page.current_path.to_s.empty?
+        current_path do |path|
+          if !path.empty?
+            begin
+              save_html if @html_save
+            rescue StandardError => e
+              warn "WARN: HTML source could not be saved. An exception is raised: #{e.inspect}."
+            end
 
-        save_html if @html_save
-        save_screenshot
+            begin
+              save_screenshot
+            rescue StandardError => e
+              warn "WARN: Screenshot could not be saved. An exception is raised: #{e.inspect}."
+            end
+          else
+            warn 'WARN: Screenshot could not be saved. `page.current_path` is empty.'
+          end
+        end
       end
 
       def save_html
@@ -104,6 +116,16 @@ module Capybara
       end
 
       private
+
+      def current_path
+        # the current_path may raise error in selenium
+        begin
+          path = page.current_path.to_s
+        rescue StandardError => e
+          warn "WARN: Screenshot could not be saved. `page.current_path` raised exception: #{e.inspect}."
+        end
+        yield path if path
+      end
 
       def output(message)
         puts "    #{CapybaraScreenshot::Helpers.yellow(message)}"

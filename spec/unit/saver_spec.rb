@@ -112,25 +112,87 @@ describe Capybara::Screenshot::Saver do
     expect(saver).to_not be_html_saved
   end
 
-  it 'does not save if current_path is empty' do
-    allow(page_mock).to receive(:current_path).and_return(nil)
-    expect(capybara_mock).to_not receive(:save_page)
-    expect(driver_mock).to_not receive(:render)
+  context 'the current_path is empty' do
+    before(:each) do
+      allow(page_mock).to receive(:current_path).and_return(nil)
+    end
 
-    saver.save
-    expect(saver).to_not be_screenshot_saved
-    expect(saver).to_not be_html_saved
+    it 'does not save' do
+      expect(capybara_mock).to_not receive(:save_page)
+      expect(driver_mock).to_not receive(:render)
+
+      saver.save
+      expect(saver).to_not be_screenshot_saved
+      expect(saver).to_not be_html_saved
+    end
+
+    it 'prints a warning' do
+      expect(saver).to receive(:warn).with(
+        'WARN: Screenshot could not be saved. `page.current_path` is empty.',
+      )
+      saver.save
+    end
   end
 
-  context 'when saving a screenshot fails' do
+  context 'when save_html raises' do
+    before(:each) do
+      allow(saver).to receive(:save_html).and_raise(NoMethodError.new('some error'))
+    end
+
+    it 'prints warning message' do
+      expect(saver).to receive(:warn).with(
+        'WARN: HTML source could not be saved. An exception is raised: #<NoMethodError: some error>.',
+      )
+      saver.save
+    end
+
+    it 'tries to save screenshot' do
+      expect(saver).to receive(:save_screenshot)
+      saver.save
+    end
+  end
+
+  context 'when save_screenshot raises' do
+    before(:each) do
+      allow(saver).to receive(:save_screenshot).and_raise(NoMethodError.new('some error'))
+    end
+
+    it 'prints warning message' do
+      expect(saver).to receive(:warn).with(
+        'WARN: Screenshot could not be saved. An exception is raised: #<NoMethodError: some error>.',
+      )
+      saver.save
+    end
+
+    it 'tries to save screenshot' do
+      expect(saver).to receive(:save_html)
+      saver.save
+    end
+  end
+
+  context 'when current_path raises' do
+    before(:each) do
+      allow(page_mock).to receive(:current_path).and_raise(NoMethodError.new('some error'))
+    end
+
+    it 'prints warning message' do
+      expect(saver).to receive(:warn).with(
+        'WARN: Screenshot could not be saved. `page.current_path` raised exception: #<NoMethodError: some error>.',
+      )
+      saver.save
+    end
+
+    it 'does not print extra warning message' do
+      expect(saver).not_to receive(:warn).with(/is empty/)
+      saver.save
+    end
+
     it 'still restores the original value of Capybara.save_and_open_page_path' do
       Capybara::Screenshot.capybara_tmp_path = 'tmp/bananas'
 
-      expect(capybara_mock).to receive(:save_page).and_raise
+      allow(page_mock).to receive(:current_path).and_raise
 
-      expect {
-        saver.save
-      }.to raise_error(RuntimeError)
+      saver.save
 
       if Capybara.respond_to?(:save_path)
         expect(Capybara.save_path).to eq('tmp/bananas')

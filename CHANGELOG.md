@@ -1,3 +1,27 @@
+2 November 2017 - 1.0.17 -> 1.0.18
+
+* [RSpec 3.3 support](https://github.com/mattheworiordan/capybara-screenshot/pull/213)
+* [Add support for selenium_chrome and selenium_chrome_headless](https://github.com/mattheworiordan/capybara-screenshot/pull/219)
+* [Less dependencies for S3 uploads](https://github.com/mattheworiordan/capybara-screenshot/pull/218)
+
+Special thanks to the fine contribution from [Matt Bricston](https://github.com/mattbrictson)
+
+17 July 2017 - 1.0.16 -> 1.0.17
+
+* [Better handling of `page.current_path` exceptions for Spinach](https://github.com/mattheworiordan/capybara-screenshot/pull/208)
+
+12 July 2017 - 1.0.15 -> 1.0.16
+
+* [Support s3 key name prefixes](https://github.com/mattheworiordan/capybara-screenshot/pull/202)
+
+12 July 2017 - 1.0.14 -> 1.0.15
+
+* [SVG badges added](https://github.com/mattheworiordan/capybara-screenshot/pull/207)
+* [Ensure the reporter module is not loaded multiple times](https://github.com/mattheworiordan/capybara-screenshot/pull/205)
+* [S3 object config option](https://github.com/mattheworiordan/capybara-screenshot/pull/204)
+* [Saver can use injected page](https://github.com/mattheworiordan/capybara-screenshot/pull/181)
+* [After* callbacks](https://github.com/mattheworiordan/capybara-screenshot/pull/171)
+
 15 Sep 2016 - 1.0.13 -> 1.0.14
 
 * CI stable again - dropped CI support for older versions of Ruby and JRuby.  It is just too painful and there is no evidence that our users need this or that Capybara Screenshot is indeed broken.  It is better to have a reliable build system so that PRs can get merged in reliably and easily.

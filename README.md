@@ -1,8 +1,8 @@
 capybara-screenshot gem
 =======================
 
-[![Build Status](https://travis-ci.org/mattheworiordan/capybara-screenshot.png)](https://travis-ci.org/mattheworiordan/capybara-screenshot)
-[![Code Climate](https://d3s6mut3hikguw.cloudfront.net/github/mattheworiordan/capybara-screenshot.png)](https://codeclimate.com/github/mattheworiordan/capybara-screenshot)
+[![Build Status](https://travis-ci.org/mattheworiordan/capybara-screenshot.svg)](https://travis-ci.org/mattheworiordan/capybara-screenshot)
+[![Code Climate](https://d3s6mut3hikguw.cloudfront.net/github/mattheworiordan/capybara-screenshot.svg)](https://codeclimate.com/github/mattheworiordan/capybara-screenshot)
 [![Gem Version](https://badge.fury.io/rb/capybara-screenshot.svg)](http://badge.fury.io/rb/capybara-screenshot)
 
 #### Capture a screen shot for every test failure automatically!
@@ -189,6 +189,17 @@ If you want to customize the location, override the file path as:
 Capybara.save_path = "/file/path"
 ```
 
+Usage with multiple Capybara sessions
+-------------------------------------
+
+To make screenshots work with multiple Capybara sessions, replace `Capybara.using_session` with `Capybara.using_session_with_screenshot`:
+
+```ruby
+Cabybara.using_session_with_screenshot('User 1') do
+  # screenshots will work and use the correct session
+end
+```
+
 
 Alternative root path
 ---------------------
@@ -199,11 +210,11 @@ Uploading screenshots to S3
 --------------------------
 You can configure capybara-screenshot to automatically save your screenshots to an AWS S3 bucket.
 
-First, install the `aws-sdk` gem or add it to your Gemfile
+First, install the `aws-sdk-s3` gem or add it to your Gemfile
 
 ```ruby
-gem 'capybara-screenshot', :group => :test
-gem 'aws-sdk', :group => :test
+gem 'aws-sdk-s3', group: :test
+gem 'capybara-screenshot', group: :test
 ```
 
 Next, configure capybara-screenshot with your S3 credentials, the bucket to save to, and an optional region (default: `us-east-1`).
@@ -219,6 +230,23 @@ Capybara::Screenshot.s3_configuration = {
 }
 ```
 
+It is also possible to specify the object parameters such as acl.
+Configure the capybara-screenshot with these options in this way:
+
+```ruby
+Capybara::Screenshot.s3_object_configuration = {
+  acl: 'public-read'
+}
+```
+
+You may optionally specify a `:key_prefix` when generating the S3 keys, which can be used to create virtual [folders](http://docs.aws.amazon.com/AmazonS3/latest/UG/FolderOperations.html) in S3, e.g.:
+
+```ruby
+Capybara::Screenshot.s3_configuration = {
+  ... # other config here
+  key_prefix: "some/folder/"
+}
+```
 
 Pruning old screenshots automatically
 --------------------------
